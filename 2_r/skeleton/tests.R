@@ -22,7 +22,7 @@ mcnemar <- function(A, B, C, D) {
 ttest <- function(diff) {
   d_mean <- mean(diff)
   d_sd <- sd(diff)
-    
+
   t <- sqrt(length(diff)) * d_mean / d_sd
   t_0975 <- qt(0.95, df = length(diff) - 1)
   p <- 2 * pt(-abs(t), length(diff) - 1)
@@ -64,10 +64,9 @@ nemenyi <- function(ranks_mean_models, n, k) {
   for (i in seq_len(k)) {
     q[i, ] <- (ranks_mean_models - ranks_mean_models[i]) /
                sqrt(k * (k + 1) / (6 * n))
-    
+    p[i, ] <- 1 - pchisq(abs(q[i, ]), k - 1, lower.tail = FALSE)
   }
-  Q_value = np.array([(FData_stats['mean_rank_models'] - FData_stats['mean_rank_models'][i]) / np.sqrt(k*(k+1)/(6*n)) for i in range(k)])
-    
+  qnemenyi <- qchisq(0.95, df = k - 1, lower.tail = FALSE)
+
   list(crit_val = qnemenyi, test_stat = q, p = p)
 }
-

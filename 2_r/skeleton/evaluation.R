@@ -30,5 +30,18 @@ ranks_mean_models <- colMeans(ranks)
 nemenyi(ranks_mean_models, n = n, k = k)
 
 # Boxplot
-# ...
-
+worst_idx <- which(max(ranks_mean_models) == ranks_mean_models)
+best_idx <- which(min(ranks_mean_models) == ranks_mean_models)
+data_best_worst <- data.frame(
+    model_error = c(data[, best_idx], data[, worst_idx]),
+    which_model = c(rep("best", nrow(data)), rep("worst", nrow(data)))
+)
+ggplot(data_best_worst) +
+    geom_histogram(aes(model_error, fill = which_model),
+                   alpha = 0.5) +
+    xlab("Error of Models") +
+    scale_fill_discrete(name = "Model",
+                        breaks = c("best", "worst"),
+                        labels = c("Best model", "Worst model")) +
+    ggtitle("Best vs worst Model errors") +
+    theme_bw()
