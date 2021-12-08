@@ -3,6 +3,7 @@ import operator
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import rcParams
+from scipy.optimize import minimize
 
 rcParams.update({'figure.autolayout': True})
 plt.style.use('seaborn-whitegrid')
@@ -32,7 +33,8 @@ def kernel_se(x_1, x_2, l, sigma_f):
     :param sigma_f:
     :return:
     """
-    return np.exp(-np.norm(x_1 - x_2)**2 / (2*l**2))
+    sq_dist = np.array([-(x - x_2)**2 for x in x_1]).reshape(x_1.shape[0], x_2.shape[0])
+    return np.exp(sq_dist / (2*l**2))
 
 
 def gp_prediction_a(data: np.ndarray, X: np.ndarray, phi: callable, sigma_n: float, Sigma_p: np.ndarray) \
@@ -144,7 +146,9 @@ def negative_log_likelihood(data: np.ndarray):
         :return:
         """
         l, sigma_f, sigma_n=theta
-        term_1=None
+        
+        K_y = kernel_se(X_train, X_train, l, sigma_f) + sigma_n ** 2 * np.eye(len(X_train))
+        term_1 = - np.matmul(Y_train.transpose(), np.matmul(np.linalg.inv(K_y), Y_train))
 
         # You are given term 2 and 3
         L=np.linalg.cholesky(K_y)
@@ -200,35 +204,35 @@ def main():
             num_features), 1.0, np.eye(num_features))
 
     # plot the computation time
-    tsa=[]
-    tsb=[]
-    dimensions=[2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096]
-    for n in dimensions:
-        print('Computing in feature dimension: ', n)
-        I_n=np.eye(n)  # setup Identity of dimensionality n
-        phi_n=phi_n_of_x(n)  # get basis functions
+    # tsa=[]
+    # tsb=[]
+    # dimensions=[2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096]
+    # for n in dimensions:
+    #     print('Computing in feature dimension: ', n)
+    #     I_n=np.eye(n)  # setup Identity of dimensionality n
+    #     phi_n=phi_n_of_x(n)  # get basis functions
 
-        #  measure time to compute for implementation A
-        start = time.time()
-        gp_prediction_a(train_data, X, phi_n, 1.0, I_n)
-        run_time = time.time() - start
-        tsa.append(run_time)
-        # measure time to compute for implementation B
-        start = time.time()
-        gp_prediction_b(train_data, X, phi_n, 1.0, I_n)
-        run_time = time.time() - start
-        tsb.append(run_time)
+    #     #  measure time to compute for implementation A
+    #     start = time.time()
+    #     gp_prediction_a(train_data, X, phi_n, 1.0, I_n)
+    #     run_time = time.time() - start
+    #     tsa.append(run_time)
+    #     # measure time to compute for implementation B
+    #     start = time.time()
+    #     gp_prediction_b(train_data, X, phi_n, 1.0, I_n)
+    #     run_time = time.time() - start
+    #     tsb.append(run_time)
 
-    plt.figure(figsize=(5, 5))
-    plt.grid(True, which="both", ls="-", alpha=0.3)
-    plt.loglog(dimensions, tsa, label='Implementation 2.11',
-               drawstyle='steps-post')
-    plt.loglog(dimensions, tsb, label='Implementation 2.12',
-               drawstyle='steps-post')
-    plt.xlabel('input dimension')
-    plt.ylabel('runtime[sec]')
-    plt.legend(loc=2)
-    plt.show()
+    # plt.figure(figsize=(5, 5))
+    # plt.grid(True, which="both", ls="-", alpha=0.3)
+    # plt.loglog(dimensions, tsa, label='Implementation 2.11',
+    #            drawstyle='steps-post')
+    # plt.loglog(dimensions, tsb, label='Implementation 2.12',
+    #            drawstyle='steps-post')
+    # plt.xlabel('input dimension')
+    # plt.ylabel('runtime[sec]')
+    # plt.legend(loc=2)
+    # plt.show()
 
     # ##################################################### Exercise (c)
     # ################################################### Data to use for this exercise
@@ -252,7 +256,8 @@ def main():
     callback_recorder=lambda x: intermediate_xs.append(np.array(x))
 
     res=minimize(negative_log_likelihood(train_data), [l_init, sigma_f_init, sigma_n_init],
-                   bounds=((1e-5, None), (1e-5, None), (1e-5, None)), method='L-BFGS-B', callback=callback_recorder)
+                   bounds=((1e-5, None), (1e-5, None), (1e-5, None)), method='L-BFGS-B', 
+                   callback=callback_recorder)
     trajectory=np.array(intermediate_xs)
     l_opt, sigma_f_opt, sigma_n_opt=res.x
     m_opt, v_opt=gp_prediction_b_kernel(

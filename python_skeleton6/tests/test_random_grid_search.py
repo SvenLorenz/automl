@@ -15,7 +15,7 @@ class TestRandomGridSearch(unittest.TestCase):
         """
         Test random search
         """
-        n_samples = 100000
+        n_samples = 10000
         random_samples = run_random_search(n_samples)
 
         # Check that all samples lie in the correct interval
@@ -26,7 +26,7 @@ class TestRandomGridSearch(unittest.TestCase):
         """
         Test upper confidence bound.
         """
-        n_samples = 100000
+        n_samples = 10000
         grid_samples = run_grid_search(n_samples)
 
         # Check that you all samples lie in the correct interval

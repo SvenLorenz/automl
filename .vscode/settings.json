@@ -1,7 +1,0 @@
-{
-    "python.testing.pytestArgs": [
-        "python_skeleton5"
-    ],
-    "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
-}

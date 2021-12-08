@@ -11,6 +11,8 @@ from sklearn.gaussian_process.kernels import Matern
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
+from scipy.stats import norm
+
 rcParams.update({'figure.autolayout': True})
 plt.style.use('seaborn-whitegrid')
 
@@ -45,8 +47,15 @@ def EI(x, model, eta, add=None):
     """
     x = np.array([x]).reshape([-1, 1])
     m, s = model.predict(x, return_std=True)
-    # Todo: Implement Expected Improvement
-    raise NotImplementedError()
+    
+    if s == 0:
+        s = 1e-9
+    
+    d = norm(loc=0, scale=1)
+    
+    Z = (eta - m) / s
+    
+    return -s * (Z * d.cdf(Z) + d.pdf(Z))
 
 
 def LCB(x, model, eta, add=None):
@@ -59,8 +68,11 @@ def LCB(x, model, eta, add=None):
     """
     x = np.array([x]).reshape([-1, 1])
     m, s = model.predict(x, return_std=True)
-    # Todo: Implement Upper Confidence Bound
-    raise NotImplementedError()
+    
+    if s == 0:
+        s = 1e-9
+    
+    return m - add * s
 
 
 def run_random_search(max_iter, seed=1):
@@ -70,8 +82,11 @@ def run_random_search(max_iter, seed=1):
     :param seed: seed used to keep experiments reproducible
     :return: all evaluated points
     """
-    # Todo: Implement random search
-    raise NotImplementedError()
+    np.random.seed(seed)
+    x = np.random.uniform(-15, 10, max_iter).reshape(-1, 1).tolist()
+    y = list(map(f, x))
+
+    return y
 
 
 def run_grid_search(max_iter, grid_size=1):
@@ -80,8 +95,10 @@ def run_grid_search(max_iter, grid_size=1):
     :param max_iter: max number of function calls. In this 1-D case for X, max iter defines dynamically the grid size
     :return: all evaluated points
     """
-    # Todo: Implement grid search
-    raise NotImplementedError()
+    x = np.linspace(-15, 10, max_iter).reshape(-1, 1).tolist()
+    y = list(map(f, x))
+
+    return y
 
 
 def run_bo(acquisition, max_iter, init=25, random=True, acq_add=1, seed=1):
@@ -174,7 +191,7 @@ def main(num_evals, init_size, repetitions, random, seed):
     grid_res = []
     for i in range(repetitions):
         bo_res_1 = run_bo(max_iter=num_evals, init=init_size, random=random, acquisition=EI, acq_add=1, seed=seed + i)
-        bo_res_2 = run_bo(max_iter=num_evals, init=init_size, random=random, acquisition=UCB, acq_add=1, seed=seed + i)
+        bo_res_2 = run_bo(max_iter=num_evals, init=init_size, random=random, acquisition=LCB, acq_add=1, seed=seed + i)
         rand_res = run_random_search(max_iter=num_evals, seed=seed + i)
         g_res = run_grid_search(max_iter=num_evals)
         EI_res.append(np.minimum.accumulate(bo_res_1).flatten())
