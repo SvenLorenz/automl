@@ -23,7 +23,7 @@ def hyperband(problem, min_budget_per_model, max_budget_per_model, eta, random_s
     """
     # Todo: Compute s_max
     # s_max =
-    raise NotImplementedError()
+    
     configs_dicts = []
     for s in tqdm(reversed(range(s_max + 1)), desc='Hyperband iter'):
         # Todo: Compute the number of models to evaluate in the HB iteration
