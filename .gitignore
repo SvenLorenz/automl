@@ -127,3 +127,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+python_skeleton7/src/data/fcnet_tabular_benchmarks/*.hdf5
