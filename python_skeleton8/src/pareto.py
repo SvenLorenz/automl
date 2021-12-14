@@ -1,5 +1,5 @@
 import numpy as np
-
+import copy
 
 def pareto(costs: np.ndarray):
     """
@@ -10,7 +10,11 @@ def pareto(costs: np.ndarray):
     # first assume all points are pareto optimal
     is_pareto = np.ones(costs.shape[0], dtype=bool)
     # Stepwise eliminate all elements that are dominated by any other point
-    raise NotImplementedError
+    costs_logical = np.zeros((costs.shape[0], costs.shape[1], costs.shape[0]-1), dtype=bool)
+    for i in range(len(is_pareto)):
+        for j in range(costs.shape[1]):
+            costs_logical[i,j,:] = costs[i,j] >= np.delete(costs[:,j], i)
+        is_pareto[i] = np.logical_not(np.any(np.sum(costs_logical[i,:,:], axis=0) == costs.shape[1]))
     return is_pareto
 
 
@@ -20,8 +24,12 @@ def nDS(costs):
     :param costs: (n_points, m_cost_values) array
     :return: list of all fronts
     """
-    # Stepwise compute the pareto front without all prior dominating points
-    raise NotImplementedError
+    costs_remaining = copy.copy(costs)
+    fronts = []
+    while len(costs_remaining) > 0:
+        curr_pareto = pareto(costs_remaining)
+        fronts.append(costs_remaining[curr_pareto,:])
+        costs_remaining = np.delete(costs_remaining, np.where(curr_pareto), axis=0)
     return fronts
 
 
@@ -33,10 +41,14 @@ def crowdingDist(front):
     """
     # TODO
     # first sort the front (first sort the first column then the second, third, ...)
-
+    sorted_front = front[np.argsort(front[:,0]),:]
+    
     # TODO
     # on the sorted front compute the distance of all points to its neighbors
-    raise NotImplementedError
+    dists = np.array([np.sum((sorted_front[i,:] - sorted_front[i+1,:])**2) for i in range(len(sorted_front)-1)])
+    dists /= np.std(dists)
+    dists[[0,-1]] = np.Inf
+    
     return sorted_front, dists
 
 
@@ -49,16 +61,20 @@ def computeHV2D(front, ref):
     """
     # TODO
     # sort front to get "outline" of polygon (don't forget to add the reference point to that outline)
-
+    sorted_front, _ = crowdingDist(np.vstack((front, ref)))
     # TODO
     # You can use the shoelace formula to compute area as we constrain ourselves to 2D
     # (https://en.wikipedia.org/wiki/Shoelace_formula)
-    return None
+    x = sorted_front[:,0]
+    y = sorted_front[:,1]
+    n = len(x)
+    shoelace = 0.5*np.abs(np.sum(x[0:n-1] * y[1:n]) + x[n-1] * y[0] - np.sum(x[1:n] * y[0:n-1]) - x[0] * y[n-1])
+    return shoelace
 
 
 if __name__ == '__main__':
     # We prepared some plotting code for you to check your pareto front implementation and the non-dominating sorting
-    from sklearn.datasets import load_boston
+    from sklearn.datasets import load_boston, load_wine
     from matplotlib import pyplot as plt
     import seaborn as sb
     sb.set_style('darkgrid')

@@ -3,7 +3,7 @@ import logging
 from sklearn.datasets import load_wine
 import numpy as np
 
-from master_solution.apriori import apriori
+from src.apriori import apriori
 
 
 class TestAPriori(unittest.TestCase):

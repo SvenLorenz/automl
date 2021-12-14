@@ -1,5 +1,6 @@
 from typing import Optional
 import numpy as np
+import copy
 
 
 def apriori(costs: np.ndarray, weights: Optional = None, order: Optional = None):
@@ -18,7 +19,14 @@ def apriori(costs: np.ndarray, weights: Optional = None, order: Optional = None)
     if weights is not None and order is not None:
         raise Exception('You can only specify weight or order but not both')
     if weights:
-        raise NotImplementedError
+        cost = np.dot(costs, weights)
+        arg = np.argmin(cost)
     if order:
-        raise NotImplementedError
+        order = np.array(order)
+        costs_temp = copy.copy(costs)
+        arg = np.arange(costs.shape[0])
+        for ord in order:
+            arg = np.argmin(costs_temp[:,ord])
+            costs_temp[~np.isin(np.arange(costs_temp.shape[0]), arg),:] = np.Inf
+        
     return arg

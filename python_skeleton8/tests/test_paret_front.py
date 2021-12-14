@@ -3,7 +3,7 @@ import logging
 from sklearn.datasets import load_wine
 import numpy as np
 
-from master_solution.pareto import pareto, nDS, crowdingDist, computeHV2D
+from src.pareto import pareto, nDS, crowdingDist, computeHV2D
 
 
 class TestParetoFront(unittest.TestCase):

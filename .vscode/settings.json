@@ -1,6 +1,6 @@
 {
     "python.testing.pytestArgs": [
-        "python_skeleton7/tests"
+        "python_skeleton8/tests"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true
