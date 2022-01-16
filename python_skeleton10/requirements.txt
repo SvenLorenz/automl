@@ -1,0 +1,32 @@
+attrs==19.3.0
+certifi==2020.4.5.1
+cycler==0.10.0
+Cython==0.29.16
+h5py==2.10.0
+importlib-metadata==1.6.0
+joblib==0.14.1
+kiwisolver==1.2.0
+matplotlib==3.2.1
+more-itertools==8.2.0
+nose==1.3.7
+# numpy==1.18.2 This version is apparently a failed build, since I couldn't import it
+numpy==1.14.2
+packaging==20.3
+pluggy==0.13.1
+py==1.8.1
+pyparsing==2.4.7
+pytest==5.4.1
+python-dateutil==2.8.1
+scikit-learn==0.22.2.post1
+scipy==1.4.1
+six==1.14.0
+sklearn==0.0
+tqdm==4.45.0
+wcwidth==0.1.9
+zipp==3.1.0
+torch==1.5
+torchvision
+graphviz
+pycodestyle
+
+# add your requirements below this line

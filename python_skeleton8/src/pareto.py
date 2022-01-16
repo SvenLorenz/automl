@@ -45,8 +45,9 @@ def crowdingDist(front):
     
     # TODO
     # on the sorted front compute the distance of all points to its neighbors
-    dists = np.array([np.sum((sorted_front[i,:] - sorted_front[i+1,:])**2) for i in range(len(sorted_front)-1)])
-    dists /= np.std(dists)
+    dists = np.array([np.abs((sorted_front[i,:] - sorted_front[i+1,:])) for i in range(len(sorted_front)-1)])
+    dists = np.sum(dists, axis=1)
+    dists /= np.max(dists) - np.min(sorted_front)
     dists[[0,-1]] = np.Inf
     
     return sorted_front, dists

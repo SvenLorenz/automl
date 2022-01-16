@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 
 python_skeleton7/src/data/fcnet_tabular_benchmarks/*.hdf5
+python_skeleton10/data/MNIST/*
+python_skeleton9/src/benchmark/nasbench_only108.tfrecord
